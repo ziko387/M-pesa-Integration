@@ -9,13 +9,27 @@ class Transaction(models.Model):
      amount = models.DecimalField(decimal_places=2,max_digits=10)
      ##Mpesa recipet number
      mpesa_receipt_number= models.CharField(max_length=100,blank=True,null=True)
-    ## transaction status: pending , completed, faliure
+     ## transaction status: pending , completed, faliure
      status = models.CharField(max_length=100,blank=True,null=True)
-description=models.CharField(blank=True,null=True)
-transaction_date = models.DateTimeField(blank=True,null=True)
-date_created = models.DateTimeField(auto_now_add=True)
-email = models.EmailField(blank=True,null=True)
-name= models.CharField( max_length=100,blank=True,null=True)
+     description=models.CharField( max_length=230,blank=True,null=True)
+
+     transaction_date = models.DateTimeField(blank=True,null=True)
+     date_created = models.DateTimeField(auto_now_add=True)
+     email = models.EmailField(blank=True,null=True)
+     name= models.CharField( max_length=100,blank=True,null=True)
+
+
+def __str__(self):
+ print(f"Transaction_id: {self.mpesa_receipt_number}{self.name}")
+ return f"Transaction_id: {self.mpesa_receipt_number}{self.name}"
+
+ # def __str__(self):
+   #print(f"Transaction_id: {self.transaction_id}{self.name}")
+   #return f"Transaction_id: {self.transaction_id}{self.name}"
+
+
+
+
 
 
 
