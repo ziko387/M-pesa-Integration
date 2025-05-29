@@ -33,7 +33,7 @@ def index(request):
 @csrf_exempt
 def stk_push(request):
     pass
-def waiting_page(request,transaction_id):
+def waiting(request,transaction_id):
     transaction=Transaction.objects.get(id=transaction_id)
     return render(request,'waiting.html',
                   {'transaction_id':transaction_id})
@@ -47,7 +47,7 @@ def check_status(request,transaction_id):
     pass
 def payment_success(request):
     return render(request,'payment_successful.html')
-def payment_failure(request):
+def payment_failed(request):
     return render(request,'payment_failed.html')
 def payment_cancelled(request):
     return render(request,'payment_cancelled.html')
