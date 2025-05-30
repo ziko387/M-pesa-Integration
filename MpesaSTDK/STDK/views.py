@@ -32,7 +32,48 @@ def index(request):
     return render(request,'index.html')
 @csrf_exempt
 def stk_push(request):
-    pass
+    if request.method =='POST':
+#        capture the form inputs
+        phone= request.POST.get('phone')
+        amount=request.POST.get('amount')
+        name=request.POST.get('name')
+        email=request.POST.get('email')
+        transaction=Transaction.objects.create(
+            phone_number=phone,
+            amount=amount,
+            status='pending',
+            name=name,
+            email=email,
+        )
+#         sending an stk push  to mpesa via daraja api
+        access_token= generate_access_token()
+        print(access_token)
+        stk_url= f'{BASE_URL}/mpesa/stkpush/v1/processrequest'
+        headers={'Authorization': f'Bearer {access_token}',
+                 'content-type': 'application/json'}
+        timestamp=datetime.now().strftime('%Y%m%d%H%M%S')
+        password=base64.b64decode(
+            f'{SHORTCODE}{PASSKEY}{timestamp}'.encode()
+        ).decode()
+        print(stk_url)
+        print(password)
+        print(timestamp)
+        payload={
+            "BusinessShortCode": SHORTCODE,
+            "Password": password,
+            "Timestamp": timestamp,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": amount,
+            "partyA": phone,
+            "partyB": SHORTCODE,
+            "phoneNumber": phone,
+            "CallbackUrl": f"{NGROK_URL}/callback",
+            "AccountReference": f"Transaction_{transaction.transaction_id}",
+            "TransactionDesc":"Payment Request",
+        }
+
+
+
 def waiting(request,transaction_id):
     transaction=Transaction.objects.get(id=transaction_id)
     return render(request,'waiting.html',

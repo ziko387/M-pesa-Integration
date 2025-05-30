@@ -18,11 +18,11 @@ from django.contrib import staticfiles
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 #M-pesa params
-CONSUMER_KEY=""
-CONSUMER_SECRET=""
-BASE_URL=""
-SHORTCODE=""
-PASSKEY=""
+CONSUMER_KEY= os.getenv("CONSUMER_KEY","default_consumer_key")
+CONSUMER_SECRET=os.getenv("CONSUMER_SECRET","default_consumer_secret")
+BASE_URL=os.getenv("BASE_URL","default_base_url")
+SHORTCODE=os.getenv("SHORTCODE","default_shortcode")
+PASSKEY=os.getenv("PASSKEY","default_passkey")
 
 
 # Quick-start development settings - unsuitable for production
