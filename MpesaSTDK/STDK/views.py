@@ -168,7 +168,25 @@ def callback(request):
 
 ## check status will enable us to track the status of the transaction
 def check_status(request,transaction_id):
-    pass
+    # get transaction needed for status prompt
+    transaction=Transaction.objects.filter(id=transaction_id).first()
+    if not transaction:
+        return JsonResponse({'error':'transaction not found',},status=404)
+    '''
+    -on stk push method-> transaction status is pending
+    - on successful payment-> transaction status is successfull
+    - on failed payment-> transaction status is failed
+    - on cancellation -> transaction status is canceled
+    '''
+    if transaction.status == 'success':
+        return JsonResponse({'status':'success',"message":"transaction successful"},status=200)
+    elif transaction.status == 'failed':
+        return JsonResponse({'status':'failed',"message":"payment failed"},status=200)
+    elif transaction.status == 'canceled':
+        return JsonResponse({'status':'canceled',"message":"transaction cancelled"},status=200)
+    else:
+        return JsonResponse({'status':'pending',"message":"transaction pending"},status=400)
+
 def payment_success(request):
     return render(request,'payment_successful.html')
 def payment_failed(request):
