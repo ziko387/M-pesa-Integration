@@ -69,8 +69,8 @@ def stk_push(request):
             "Amount": amount,
             "partyA": phone,
             "partyB": SHORTCODE,
-            "phoneNumber": phone,
-            "CallbackUrl": f"{NGROK_URL}/callback",
+            "PhoneNumber": phone,
+            "CallbackUrl": f"{NGROK_URL}/callback/",
             "AccountReference": f"Transaction_{transaction.transaction_id}",
             "TransactionDesc":"Payment Request",
         }
@@ -178,7 +178,7 @@ def check_status(request,transaction_id):
     - on failed payment-> transaction status is failed
     - on cancellation -> transaction status is canceled
     '''
-    if transaction.status == 'success':
+    if transaction.status == 'Success':
         return JsonResponse({'status':'success',"message":"transaction successful"},status=200)
     elif transaction.status == 'failed':
         return JsonResponse({'status':'failed',"message":"payment failed"},status=200)
