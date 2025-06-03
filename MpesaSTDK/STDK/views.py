@@ -26,10 +26,12 @@ class MpesaPassword:
 # access token: security credentials provides from daraja mpesa to authorize tokens
 def generate_access_token():
     auth_url=f'{BASE_URL}/oauth/v1/generate?grant_type=client_credentials'
-    response=requests.post(auth_url,auth=(CONSUMER_KEY,CONSUMER_SECRET))
+    response=requests.get(auth_url,auth=(CONSUMER_KEY,CONSUMER_SECRET))
     result=response.json().get('access_token')
     print(result)
     return result
+
+
 
 def index(request):
     return render(request,'index.html')
@@ -55,9 +57,12 @@ def stk_push(request):
         headers={'Authorization': f'Bearer {access_token}',
                  'content-type': 'application/json'}
         timestamp=datetime.now().strftime('%Y%m%d%H%M%S')
-        password=base64.b64decode(
+        password=base64.b64encode(
             f'{SHORTCODE}{PASSKEY}{timestamp}'.encode()
         ).decode()
+
+
+
         print(stk_url)
         print(password)
         print(timestamp)
@@ -67,11 +72,11 @@ def stk_push(request):
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
-            "partyA": phone,
-            "partyB": SHORTCODE,
+            "PartyA": phone,
+            "PartyB": SHORTCODE,
             "PhoneNumber": phone,
-            "CallbackUrl": f"{NGROK_URL}/callback/",
-            "AccountReference": f"Transaction_{transaction.transaction_id}",
+            "CallBackURL": f"{NGROK_URL}/callback/",
+            "AccountReference": f"Transaction_{transaction.id}",
             "TransactionDesc":"Payment Request",
         }
         responses= requests.post(stk_url,headers=headers,json=payload)
@@ -84,7 +89,7 @@ def stk_push(request):
         transaction.description=responses_data.get('ResposeDescription','no description')
         transaction.save()
 
-        return redirect('waiting',transaction_id=transaction_id)
+        return redirect('waiting',transaction_id=transaction.id)
     return JsonResponse({'error':'invalid request',},status=400)
 
 

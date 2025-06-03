@@ -3,7 +3,7 @@ from. import views
 urlpatterns = [
     path('', views.index, name='index'),
     # path to prompt stk push
-    path('stk_push', views.stk_push, name='stk_push'),
+    path('stk_push/', views.stk_push, name='stk_push'),
     # routes for status checking
     path('waiting/<int:transaction_id>/', views.waiting, name='waiting'),
     # this is the path that will receive the status of our transaction
