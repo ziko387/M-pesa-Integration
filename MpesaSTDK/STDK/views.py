@@ -47,6 +47,7 @@ def stk_push(request):
             phone_number=phone,
             amount=amount,
             status='pending',
+            description="awaiting status results",
             name=name,
             email=email,
         )
@@ -79,14 +80,14 @@ def stk_push(request):
             "AccountReference": f"Transaction_{transaction.id}",
             "TransactionDesc":"Payment Request",
         }
-        responses= requests.post(stk_url,headers=headers,json=payload)
-        print('responses',responses)
-        responses_data=responses.json()
-        print(responses_data)
+        response= requests.post(stk_url,headers=headers,json=payload)
+        print('response',response)
+        response_data=response.json()
+        print(response_data)
 
-        transaction_id=responses_data.get('CheckoutRequestId',None)
+        transaction_id=response_data.get('CheckoutRequestID',None)
         transaction.transaction_id=transaction_id
-        transaction.description=responses_data.get('ResposeDescription','no description')
+        transaction.description=response_data.get('ResponseDescription','no description')
         transaction.save()
 
         return redirect('waiting',transaction_id=transaction.id)
@@ -109,16 +110,16 @@ def callback(request):
            stk_callback=data.get('Body',{}).get('stkCallback',{})
            result_code=stk_callback.get('ResultCode',None)
            result_desc=stk_callback.get('ResultDesc','')
-           transaction_id=stk_callback.get('CheckoutRequestId',None)
+           transaction_id=stk_callback.get('CheckoutRequestID',None)
            print("callback result")
            print(transaction_id,result_code)
            if transaction_id:
-               transaction= Transaction.objects.get(id=transaction_id)
+               transaction= Transaction.objects.filter(transaction_id=transaction_id).first()
                print("current transaction in db",transaction)
                if transaction:
                    if result_code == 0:
-                       callback_metadata= (stk_callback.get('CallbackMetadata',{})
-                                           .get('Item',[]))
+                       callback_metadata= stk_callback.get('CallbackMetadata',{}
+                                                         ).get('Item',[])
                        receipt_number =next((item.get('value')
                                              for item in callback_metadata
                                                  if item.get('name') == 'MpesaReceiptNumber'),
@@ -176,7 +177,7 @@ def check_status(request,transaction_id):
     # get transaction needed for status prompt
     transaction=Transaction.objects.filter(id=transaction_id).first()
     if not transaction:
-        return JsonResponse({'error':'transaction not found',},status=404)
+        return JsonResponse({"status":'failed',"message":'transaction not found!'},status=404)
     '''
     -on stk push method-> transaction status is pending
     - on successful payment-> transaction status is successfull
@@ -190,7 +191,7 @@ def check_status(request,transaction_id):
     elif transaction.status == 'canceled':
         return JsonResponse({'status':'canceled',"message":"transaction cancelled"},status=200)
     else:
-        return JsonResponse({'status':'pending',"message":"transaction pending"},status=400)
+        return JsonResponse({'status':'pending',"message":"transaction pending"},status=200)
 
 def payment_success(request):
     return render(request,'payment_successful.html')

@@ -25,11 +25,11 @@
 </div>
 <script>
     const transactionId = "{{ transaction_id }}";
-    const NGROK_URL = " https://5be9-197-237-118-180.ngrok-free.app";
+    const NGROK_URL = "https://1205-105-160-89-10.ngrok-free.app"
 
       let checkStatusInterval = setInterval(function () {
         console.log("Checking transaction status...");
-        fetch(`${NGROK_URL}/check-status/${transactionId}/`)
+        fetch(`${NGROK_URL}/check-status/${transactionId}`)
           .then((response) => response.json())
           .then((data) => {
             if (data.status === "Success") {
